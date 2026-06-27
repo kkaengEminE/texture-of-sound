@@ -21,8 +21,15 @@ export function zcr(frame: Float32Array): number {
 }
 
 export function downmix(channels: Float32Array[]): Float32Array {
+  if (channels.length === 0) return new Float32Array(0);
   if (channels.length === 1) return channels[0];
-  const len = channels[0].length;
+
+  // Find minimum length across all channels
+  let len = channels[0].length;
+  for (let c = 1; c < channels.length; c++) {
+    if (channels[c].length < len) len = channels[c].length;
+  }
+
   const out = new Float32Array(len);
   for (let i = 0; i < len; i++) {
     let s = 0;

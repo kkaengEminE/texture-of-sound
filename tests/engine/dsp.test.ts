@@ -32,6 +32,27 @@ describe('downmix', () => {
     expect(result[0]).toBeCloseTo(0.5, 5);
     expect(result[1]).toBeCloseTo(0, 5);
   });
+  it('빈 채널 배열은 빈 Float32Array 반환', () => {
+    const result = downmix([]);
+    expect(result).toBeInstanceOf(Float32Array);
+    expect(result.length).toBe(0);
+  });
+  it('길이가 다른 채널들은 최소 길이로 처리', () => {
+    const ch1 = new Float32Array([0, 1, 9]);
+    const ch2 = new Float32Array([1, -1]);
+    const result = Array.from(downmix([ch1, ch2]));
+    expect(result.length).toBe(2);
+    expect(result[0]).toBeCloseTo(0.5, 5);
+    expect(result[1]).toBeCloseTo(0, 5);
+  });
+  it('3채널 평균 검증', () => {
+    const ch1 = new Float32Array([3]);
+    const ch2 = new Float32Array([6]);
+    const ch3 = new Float32Array([9]);
+    const result = Array.from(downmix([ch1, ch2, ch3]));
+    expect(result.length).toBe(1);
+    expect(result[0]).toBeCloseTo(6, 5);
+  });
 });
 
 describe('normalizeArray', () => {
