@@ -2,6 +2,7 @@ import {
   DecodedAudio, SongAnalysis, CompositionMap, BrushStroke,
   analyzeSong, buildVisualLanguage, buildComposition, buildBrushPaths,
 } from '@/engine';
+// TODO: @/engine에서 cyrb53가 re-export되면 이 deep import를 교체할 것 (엔진 수정 금지 제약으로 현재 deep import 유지)
 import { cyrb53 } from '@/engine/util/determinism';
 
 export type Stage = 'analyze' | 'visual' | 'compose' | 'brush' | 'done';

@@ -21,7 +21,7 @@ export function analyzeInWorker(
       else if (m.type === 'done') { resolve(m.result); worker.terminate(); }
       else { reject(new Error(m.message)); worker.terminate(); }
     };
-    worker.onerror = (e) => { reject(new Error(e.message)); worker.terminate(); };
+    worker.onerror = (e) => { reject(new Error(e.message || 'Worker error')); worker.terminate(); };
     // PCM 버퍼 transfer (복사 없음)
     const transfer = [audio.mono.buffer, ...audio.channels.map((c) => c.buffer)];
     const msg: WorkerIn = { audio };
