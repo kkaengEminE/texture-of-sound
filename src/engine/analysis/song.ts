@@ -14,7 +14,7 @@ export function estimateBpm(onsets: number[], frameRate: number): number {
   const n = env.length;
   if (n < 4) return 120;
   const minBpm = 60, maxBpm = 180;
-  const minLag = Math.floor((60 / maxBpm) * frameRate);
+  const minLag = Math.max(1, Math.floor((60 / maxBpm) * frameRate));
   const maxLag = Math.ceil((60 / minBpm) * frameRate);
   let bestLag = minLag, bestVal = -Infinity;
   for (let lag = minLag; lag <= maxLag && lag < n; lag++) {
@@ -54,9 +54,9 @@ export function analyzeSong(audio: DecodedAudio): SongAnalysis {
   for (const f of frames) for (let i = 0; i < 12; i++) chromaSum[i] += f.chroma[i] ?? 0;
 
   const rmsVals = frames.map((f) => f.rms);
-  const loudnessRange: [number, number] = rmsVals.length
-    ? [Math.min(...rmsVals), Math.max(...rmsVals)]
-    : [0, 0];
+  let minRms = Infinity, maxRms = -Infinity;
+  for (const v of rmsVals) { if (v < minRms) minRms = v; if (v > maxRms) maxRms = v; }
+  const loudnessRange: [number, number] = rmsVals.length ? [minRms, maxRms] : [0, 0];
   const avg = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0);
 
   return {
