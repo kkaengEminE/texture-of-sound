@@ -46,6 +46,7 @@ describe('segmentSong', () => {
     for (let i = 1; i < segs.length; i++) {
       expect(segs[i].t0).toBeCloseTo(segs[i - 1].t1, 5);
     }
+    expect(segs[segs.length - 1].t1).toBeCloseTo(frames.length * 512 / 44100, 5);
   });
   it('가장 에너지 높은 구간이 climax', () => {
     const climax = segs.find((s) => s.role === 'climax');

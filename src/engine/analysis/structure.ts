@@ -1,5 +1,5 @@
 import { FrameFeatures, Segment, SegmentRole } from '../types';
-import { normalizeArray, clamp01 } from '../util/dsp';
+import { normalizeArray } from '../util/dsp';
 
 // 프레임 특징을 정규화 벡터로 만들어 인접 윈도우 평균 간 차이로 novelty 산출
 export function noveltyCurve(frames: FrameFeatures[]): number[] {
