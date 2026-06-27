@@ -31,7 +31,7 @@ export default function AnalyzePage() {
           try { await saveAudio(result.seed, blob); }
           catch { /* audio is optional; viewer degrades gracefully */ }
         }
-        router.replace(`/viewer/${result.seed}`);
+        router.replace(`/viewer?id=${result.seed}`);
       })
       .catch((e) => setError(e instanceof Error ? e.message : '분석 실패'));
   }, [router]);

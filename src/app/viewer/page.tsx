@@ -1,6 +1,6 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { Suspense, useEffect, useRef, useState } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { loadPainting, loadAudio } from '@/lib/store';
 import type { StoredPainting } from '@/lib/types';
 import { segmentAtTime } from '@/engine';
@@ -12,8 +12,8 @@ import { LayerToggle } from '@/components/LayerToggle';
 import { ExplanationPanel } from '@/components/ExplanationPanel';
 import type { Selection } from '@/components/ExplanationPanel';
 
-export default function ViewerPage() {
-  const { id } = useParams<{ id: string }>();
+function ViewerInner() {
+  const id = useSearchParams().get('id') ?? '';
   const router = useRouter();
   const [painting, setPainting] = useState<StoredPainting | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
@@ -29,7 +29,7 @@ export default function ViewerPage() {
     setPainting(p);
   }, [id, router]);
 
-  // Fix 2: audio ObjectURL 로드 + cleanup 시 revoke
+  // audio ObjectURL 로드 + cleanup 시 revoke
   useEffect(() => {
     if (!painting) return;
     let objectUrl: string | null = null;
@@ -43,8 +43,7 @@ export default function ViewerPage() {
     return () => { cancelled = true; if (objectUrl) URL.revokeObjectURL(objectUrl); };
   }, [id, painting]);
 
-  // Fix 1: painting이 설정된 후에만 audio element가 DOM에 존재 → deps에 painting 추가
-  // audio element 시간 동기화
+  // painting이 설정된 후에만 audio element가 DOM에 존재 → deps에 painting 추가
   useEffect(() => {
     const el = audioRef.current;
     if (!el) return;
@@ -62,7 +61,6 @@ export default function ViewerPage() {
 
   function toggle() {
     const el = audioRef.current; if (!el) return;
-    // Fix 3: play() Promise rejection 처리 (autoplay policy)
     if (playing) { el.pause(); setPlaying(false); } else { el.play().then(() => setPlaying(true)).catch(() => setPlaying(false)); }
   }
   function seek(t: number) {
@@ -101,5 +99,14 @@ export default function ViewerPage() {
         <ExplanationPanel song={painting.song} selection={selection} />
       </aside>
     </div>
+  );
+}
+
+export default function ViewerPage() {
+  // useSearchParams는 static export에서 Suspense 경계를 요구한다
+  return (
+    <Suspense fallback={<p className="text-sm text-neutral-500">불러오는 중…</p>}>
+      <ViewerInner />
+    </Suspense>
   );
 }
