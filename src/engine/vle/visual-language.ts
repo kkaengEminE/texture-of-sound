@@ -18,6 +18,7 @@ export const MAPPING = {
 const CIRCLE_OF_FIFTHS = [0, 7, 2, 9, 4, 11, 6, 1, 8, 3, 10, 5];
 function pitchClassToHue(pc: number): number {
   const pos = CIRCLE_OF_FIFTHS.indexOf(pc);
+  if (pos === -1) return 0;
   return (pos / 12) * 360;
 }
 
