@@ -27,7 +27,10 @@ export default function AnalyzePage() {
           seed: result.seed, song: result.song, comp: result.comp, strokes: result.strokes,
           meta: { title, duration: result.song.meta.duration, createdAt: Date.now() },
         });
-        if (blob) await saveAudio(result.seed, blob);
+        if (blob) {
+          try { await saveAudio(result.seed, blob); }
+          catch { /* audio is optional; viewer degrades gracefully */ }
+        }
         router.replace(`/viewer/${result.seed}`);
       })
       .catch((e) => setError(e instanceof Error ? e.message : '분석 실패'));
