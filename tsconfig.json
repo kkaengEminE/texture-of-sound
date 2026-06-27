@@ -17,6 +17,6 @@
     "types": ["node"],
     "paths": { "@/*": ["./src/*"] }
   },
-  "include": ["src", "tests", "next-env.d.ts", ".next/types/**/*.ts"],
+  "include": ["src", "tests", "vitest.setup.ts", "next-env.d.ts", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
 }
