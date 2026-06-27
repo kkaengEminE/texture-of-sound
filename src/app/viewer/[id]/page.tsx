@@ -27,9 +27,23 @@ export default function ViewerPage() {
     const p = loadPainting(id);
     if (!p) { router.replace('/'); return; }
     setPainting(p);
-    loadAudio(id).then((blob) => { if (blob) setAudioUrl(URL.createObjectURL(blob)); });
   }, [id, router]);
 
+  // Fix 2: audio ObjectURL 로드 + cleanup 시 revoke
+  useEffect(() => {
+    if (!painting) return;
+    let objectUrl: string | null = null;
+    let cancelled = false;
+    loadAudio(id).then((blob) => {
+      if (blob && !cancelled) {
+        objectUrl = URL.createObjectURL(blob);
+        setAudioUrl(objectUrl);
+      }
+    });
+    return () => { cancelled = true; if (objectUrl) URL.revokeObjectURL(objectUrl); };
+  }, [id, painting]);
+
+  // Fix 1: painting이 설정된 후에만 audio element가 DOM에 존재 → deps에 painting 추가
   // audio element 시간 동기화
   useEffect(() => {
     const el = audioRef.current;
@@ -39,7 +53,7 @@ export default function ViewerPage() {
     el.addEventListener('timeupdate', onTime);
     el.addEventListener('ended', onEnd);
     return () => { el.removeEventListener('timeupdate', onTime); el.removeEventListener('ended', onEnd); };
-  }, [audioUrl]);
+  }, [audioUrl, painting]);
 
   if (!painting) return <p className="text-sm text-neutral-500">불러오는 중…</p>;
 
@@ -48,7 +62,8 @@ export default function ViewerPage() {
 
   function toggle() {
     const el = audioRef.current; if (!el) return;
-    if (playing) { el.pause(); setPlaying(false); } else { el.play(); setPlaying(true); }
+    // Fix 3: play() Promise rejection 처리 (autoplay policy)
+    if (playing) { el.pause(); setPlaying(false); } else { el.play().then(() => setPlaying(true)).catch(() => setPlaying(false)); }
   }
   function seek(t: number) {
     const el = audioRef.current; if (el) el.currentTime = t;
