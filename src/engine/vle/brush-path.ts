@@ -1,6 +1,7 @@
 import { BrushStroke, CompositionMap, Layer, Segment, VisualLanguage } from '../types';
 import { mulberry32 } from '../util/determinism';
 
+// tie order: bass > high > mid (deterministic)
 export function dominantLayer(band: { bass: number; mid: number; high: number }): Layer {
   if (band.bass >= band.mid && band.bass >= band.high) return 'bass';
   if (band.high >= band.mid && band.high >= band.bass) return 'high';
@@ -19,6 +20,7 @@ export function buildBrushPaths(
   const rnd = mulberry32(seed);
   const { width, height } = comp.canvas;
   const strokes: BrushStroke[] = [];
+  const avgDt = vl.frames.length > 1 ? (vl.frames[vl.frames.length - 1].time - vl.frames[0].time) / (vl.frames.length - 1) : 0.1;
 
   for (let i = 0; i < vl.frames.length; i += STROKE_EVERY) {
     const f = vl.frames[i];
@@ -42,6 +44,9 @@ export function buildBrushPaths(
       points.push({ x: clampPx(x, width), y: clampPx(y, height) });
     }
 
+    const nextT = vl.frames[Math.min(i + STROKE_EVERY, vl.frames.length - 1)]?.time ?? f.time;
+    const t1 = nextT > f.time ? nextT : f.time + avgDt;
+
     strokes.push({
       id: `s${i}`,
       segmentIndex: seg.index,
@@ -54,7 +59,7 @@ export function buildBrushPaths(
       color: { h: f.hue, s: 0.45 + 0.4 * f.density, l: f.lightness },
       blur: f.blur * 12,
       t0: f.time,
-      t1: vl.frames[Math.min(i + STROKE_EVERY, vl.frames.length - 1)]?.time ?? f.time,
+      t1,
     });
   }
   return strokes;

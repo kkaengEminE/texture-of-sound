@@ -42,7 +42,12 @@ describe('buildBrushPaths', () => {
         expect(p.y).toBeLessThanOrEqual(900);
       }
       expect(s.t1).toBeGreaterThanOrEqual(s.t0);
-      expect(['all','bass','mid','high']).toContain(s.layer);
+      expect(['bass','mid','high']).toContain(s.layer);
+    }
+  });
+  it('모든 스트로크가 t1 > t0을 보장한다', () => {
+    for (const s of strokes) {
+      expect(s.t1).toBeGreaterThan(s.t0);
     }
   });
   it('결정론: 같은 seed면 동일', () => {
