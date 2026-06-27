@@ -10,6 +10,17 @@ const segments: Segment[] = [
   { index: 3, t0: 30, t1: 40, role: 'outro', energy: 0.1, summary: '침묵의 마침표' },
 ];
 
+describe('buildComposition — empty-array guard', () => {
+  it('segments=[] → regions 길이 0, throw 없음', () => {
+    const result = buildComposition(vl, [], { width: 800, height: 600 });
+    expect(result.regions.length).toBe(0);
+  });
+  it('segments=[] → flow 길이 0', () => {
+    const result = buildComposition(vl, [], { width: 800, height: 600 });
+    expect(result.flow.length).toBe(0);
+  });
+});
+
 describe('buildComposition', () => {
   const comp = buildComposition(vl, segments, { width: 1600, height: 900 });
   it('구간 수만큼 region', () => {

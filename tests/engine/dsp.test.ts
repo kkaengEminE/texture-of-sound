@@ -62,6 +62,12 @@ describe('normalizeArray', () => {
   it('상수 배열은 모두 0', () => {
     expect(normalizeArray([5, 5, 5])).toEqual([0, 0, 0]);
   });
+  it('NaN 입력은 0으로 처리 → [0, NaN, 10] → [0, 0, 1]', () => {
+    expect(normalizeArray([0, NaN, 10])).toEqual([0, 0, 1]);
+  });
+  it('Infinity 입력은 0으로 처리 → [0, Infinity, 5] → [0, 0, 1]', () => {
+    expect(normalizeArray([0, Infinity, 5])).toEqual([0, 0, 1]);
+  });
 });
 
 describe('clamp01', () => {

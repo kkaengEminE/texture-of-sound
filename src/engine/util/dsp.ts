@@ -41,9 +41,10 @@ export function downmix(channels: Float32Array[]): Float32Array {
 
 export function normalizeArray(xs: number[]): number[] {
   if (xs.length === 0) return [];
-  let min = xs[0], max = xs[0];
-  for (const x of xs) { if (x < min) min = x; if (x > max) max = x; }
+  const clean = xs.map((x) => (Number.isFinite(x) ? x : 0));
+  let min = clean[0], max = clean[0];
+  for (const x of clean) { if (x < min) min = x; if (x > max) max = x; }
   const range = max - min;
-  if (range === 0) return xs.map(() => 0);
-  return xs.map((x) => (x - min) / range);
+  if (range === 0) return clean.map(() => 0);
+  return clean.map((x) => (x - min) / range);
 }

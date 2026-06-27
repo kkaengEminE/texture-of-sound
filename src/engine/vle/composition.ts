@@ -6,6 +6,9 @@ export function buildComposition(
   canvas: { width: number; height: number }
 ): CompositionMap {
   const margins = { top: 0.06, right: 0.06, bottom: 0.06, left: 0.06 };
+  if (segments.length === 0) {
+    return { canvas, regions: [], focalPoint: { x: 0.5, y: 0.5 }, flow: [], margins };
+  }
   const innerW = 1 - margins.left - margins.right;
 
   // 가중치 = 길이 0.5 + 에너지 0.5 (비균등). 합으로 정규화.

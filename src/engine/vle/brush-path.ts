@@ -70,6 +70,7 @@ export function buildBrushPaths(
 }
 
 function segmentAt(segments: Segment[], time: number): Segment {
+  if (segments.length === 0) throw new Error('segmentAt: segments must not be empty');
   for (const s of segments) if (time >= s.t0 && time < s.t1) return s;
   return segments[segments.length - 1];
 }
